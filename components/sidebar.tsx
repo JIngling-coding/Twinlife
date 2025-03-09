@@ -8,134 +8,82 @@ import {
   Coffee,
   Zap,
   PlayCircle,
-  HeartPulse,
-  BookOpen,
+  Brain,
+  FileText,
   RotateCcw,
   Lightbulb,
+  UserCog,
   Building2,
   Settings,
-  type LucideIcon,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Separator } from "@/components/ui/separator"
+import { useSidebarStore } from "@/store/sidebar"
 
-interface SidebarProps {
-  isOpen: boolean
-}
+const menuItems = [
+  { name: "首页", href: "/", icon: Home, iconColor: "text-[#4A9EFF]" },
+  { name: "人生管理", href: "/life", icon: User, iconColor: "text-[#9F7AEA]" },
+  { name: "生活管理", href: "/daily", icon: Coffee, iconColor: "text-[#F56565]" },
+  { name: "能量管理", href: "/energy", icon: Zap, iconColor: "text-[#ECC94B]" },
+  { name: "行动管理", href: "/action", icon: PlayCircle, iconColor: "text-[#48BB78]" },
+  { name: "清空大脑", href: "/brain", icon: Brain, iconColor: "text-[#F56565]" },
+  { name: "知识管理", href: "/knowledge", icon: FileText, iconColor: "text-[#ED8936]" },
+  { name: "复盘管理", href: "/review", icon: RotateCcw, iconColor: "text-[#4A9EFF]" },
+  { name: "创造管理", href: "/create", icon: Lightbulb, iconColor: "text-[#48BB78]" },
+]
 
-interface NavItem {
-  name: string
-  href: string
-  icon: LucideIcon
-}
+const bottomMenuItems = [
+  { name: "个人设置", href: "/personal", icon: UserCog, iconColor: "text-[#6B7280]" },
+  { name: "公司管理", href: "/company", icon: Building2, iconColor: "text-[#6B7280]" },
+  { name: "系统设置", href: "/settings", icon: Settings, iconColor: "text-[#6B7280]" },
+]
 
-export function Sidebar({ isOpen }: SidebarProps) {
+export default function Sidebar() {
   const pathname = usePathname()
-
-  const navItems: NavItem[] = [
-    { name: "首页", href: "/", icon: Home },
-    { name: "人生管理", href: "/life", icon: User },
-    { name: "生活管理", href: "/daily", icon: Coffee },
-    { name: "能量管理", href: "/energy", icon: Zap },
-    { name: "行动管理", href: "/action", icon: PlayCircle },
-    { name: "情感实验", href: "/emotion", icon: HeartPulse },
-    { name: "知识管理", href: "/knowledge", icon: BookOpen },
-    { name: "复盘管理", href: "/review", icon: RotateCcw },
-    { name: "创造管理", href: "/creation", icon: Lightbulb },
-  ]
-
-  const companyItems: NavItem[] = [
-    { name: "个人设置", href: "/profile", icon: User },
-    { name: "公司管理", href: "/company", icon: Building2 },
-    { name: "系统设置", href: "/settings", icon: Settings },
-  ]
-
-  if (!isOpen) {
-    return (
-      <aside className="flex w-16 flex-col justify-between border-r bg-background">
-        <nav className="flex flex-col items-center gap-4 py-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-md",
-                pathname === item.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-              title={item.name}
-              aria-current={pathname === item.href ? "page" : undefined}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="sr-only">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="mb-4 flex flex-col items-center gap-4 pt-4">
-          <Separator className="w-8" />
-          {companyItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-md",
-                pathname === item.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-              title={item.name}
-              aria-current={pathname === item.href ? "page" : undefined}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="sr-only">{item.name}</span>
-            </Link>
-          ))}
-        </div>
-      </aside>
-    )
-  }
+  const { isExpanded } = useSidebarStore()
 
   return (
-    <aside className="flex w-52 flex-col justify-between border-r bg-background">
-      <nav className="flex flex-col gap-1 py-2">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
-              pathname === item.href
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-            aria-current={pathname === item.href ? "page" : undefined}
-          >
-            <item.icon className="h-5 w-5" />
-            <span>{item.name}</span>
-          </Link>
-        ))}
+    <aside
+      className={`border-r bg-white transition-all duration-300 flex flex-col ${isExpanded ? "w-[133px]" : "w-[40px]"}`}
+    >
+      <nav className="flex flex-col py-2 flex-1">
+        {menuItems.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center ${isExpanded ? "px-3" : "justify-center"} py-3 text-sm transition-colors ${
+                isActive ? "bg-[#E3F2FD] text-[#4A9EFF]" : "text-gray-700 hover:bg-[#E3F2FD] hover:text-[#4A9EFF]"
+              }`}
+              title={item.name}
+            >
+              <item.icon className={`${isExpanded ? "mr-2" : ""} h-5 w-5 ${item.iconColor}`} />
+              {isExpanded && <span className="truncate">{item.name}</span>}
+            </Link>
+          )
+        })}
       </nav>
 
-      <div className="mb-4 flex flex-col gap-1 px-2 pt-2">
-        <Separator className="my-2" />
-        {companyItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
-              pathname === item.href
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-            aria-current={pathname === item.href ? "page" : undefined}
-          >
-            <item.icon className="h-5 w-5" />
-            <span>{item.name}</span>
-          </Link>
-        ))}
+      {/* 分隔线 */}
+      <div className="border-t border-gray-200 mx-2"></div>
+
+      {/* 底部菜单项 */}
+      <div className="mt-1 mb-2">
+        {bottomMenuItems.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center ${isExpanded ? "px-3" : "justify-center"} py-3 text-sm transition-colors ${
+                isActive ? "bg-[#E3F2FD] text-[#4A9EFF]" : "text-gray-700 hover:bg-[#E3F2FD] hover:text-[#4A9EFF]"
+              }`}
+              title={item.name}
+            >
+              <item.icon className={`${isExpanded ? "mr-2" : ""} h-5 w-5 ${item.iconColor}`} />
+              {isExpanded && <span className="truncate">{item.name}</span>}
+            </Link>
+          )
+        })}
       </div>
     </aside>
   )
