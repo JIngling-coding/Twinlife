@@ -1,4 +1,6 @@
-export function EmptyContent() {
+import type { FC } from "react"
+
+export const EmptyContent: FC = () => {
   return (
     <div className="flex h-full items-center justify-center">
       <div className="text-center">

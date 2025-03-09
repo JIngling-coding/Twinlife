@@ -1,13 +1,11 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 
 interface MainLayoutProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
@@ -15,7 +13,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="flex h-screen flex-col">
-      <Header isSidebarOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <Header isSidebarOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} />
         <main className="flex-1 overflow-auto p-4">{children}</main>

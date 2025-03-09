@@ -19,11 +19,11 @@ export function Header({ isSidebarOpen, toggleSidebar }: HeaderProps) {
         <h1 className="text-xl font-semibold">双生世界：人生管理系统</h1>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" aria-label="设置">
           <Settings className="h-5 w-5" />
-          <span className="sr-only">普通模式</span>
+          <span className="sr-only">设置</span>
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" aria-label="用户">
           <User className="h-5 w-5" />
           <span className="sr-only">用户</span>
         </Button>

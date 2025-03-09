@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -16,6 +14,7 @@ import {
   Lightbulb,
   Building2,
   Settings,
+  type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
@@ -27,7 +26,7 @@ interface SidebarProps {
 interface NavItem {
   name: string
   href: string
-  icon: React.ElementType
+  icon: LucideIcon
 }
 
 export function Sidebar({ isOpen }: SidebarProps) {
@@ -55,48 +54,44 @@ export function Sidebar({ isOpen }: SidebarProps) {
     return (
       <aside className="flex w-16 flex-col justify-between border-r bg-background">
         <nav className="flex flex-col items-center gap-4 py-4">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-md",
-                  pathname === item.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-                title={item.name}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="sr-only">{item.name}</span>
-              </Link>
-            )
-          })}
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-md",
+                pathname === item.href
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+              title={item.name}
+              aria-current={pathname === item.href ? "page" : undefined}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="sr-only">{item.name}</span>
+            </Link>
+          ))}
         </nav>
 
         <div className="mb-4 flex flex-col items-center gap-4 pt-4">
           <Separator className="w-8" />
-          {companyItems.map((item) => {
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-md",
-                  pathname === item.href
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-                title={item.name}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="sr-only">{item.name}</span>
-              </Link>
-            )
-          })}
+          {companyItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-md",
+                pathname === item.href
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+              title={item.name}
+              aria-current={pathname === item.href ? "page" : undefined}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="sr-only">{item.name}</span>
+            </Link>
+          ))}
         </div>
       </aside>
     )
@@ -105,46 +100,42 @@ export function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside className="flex w-52 flex-col justify-between border-r bg-background">
       <nav className="flex flex-col gap-1 py-2">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
-                pathname === item.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Icon className="h-5 w-5" />
-              <span>{item.name}</span>
-            </Link>
-          )
-        })}
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
+              pathname === item.href
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+            aria-current={pathname === item.href ? "page" : undefined}
+          >
+            <item.icon className="h-5 w-5" />
+            <span>{item.name}</span>
+          </Link>
+        ))}
       </nav>
 
       <div className="mb-4 flex flex-col gap-1 px-2 pt-2">
         <Separator className="my-2" />
-        {companyItems.map((item) => {
-          const Icon = item.icon
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
-                pathname === item.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Icon className="h-5 w-5" />
-              <span>{item.name}</span>
-            </Link>
-          )
-        })}
+        {companyItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
+              pathname === item.href
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+            aria-current={pathname === item.href ? "page" : undefined}
+          >
+            <item.icon className="h-5 w-5" />
+            <span>{item.name}</span>
+          </Link>
+        ))}
       </div>
     </aside>
   )
