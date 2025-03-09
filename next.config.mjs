@@ -21,8 +21,6 @@ const nextConfig = {
   },
   experimental: {
     webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
   },
   output: 'export',
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
