@@ -3,16 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameDay,
-  addMonths,
-  subMonths,
-  getDaysInMonth,
-} from "date-fns"
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import {
   ChevronLeft,
@@ -182,11 +173,8 @@ export function HabitHeatmap() {
     end: endOfMonth(currentMonth),
   })
 
-  // 获取当月天数
-  const daysCount = getDaysInMonth(currentMonth)
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* 统计数据 */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="p-4">
@@ -234,49 +222,39 @@ export function HabitHeatmap() {
       </div>
 
       {/* 习惯列表 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+      <div className="space-y-8">
         {habits.map((habit) => (
-          <div key={habit.id} className="flex items-start space-x-3">
-            {/* 习惯图标按钮 */}
-            <button
-              onClick={() => recordHabit(habit.id)}
-              className={`p-2 rounded-full ${habit.bgColor} hover:opacity-80 transition-opacity flex-shrink-0`}
-            >
-              <div className={`text-${habit.color.split("-")[1]}-500`}>{habit.icon}</div>
-            </button>
-
-            <div className="flex-1 min-w-0">
-              {/* 习惯名称 */}
-              <div className="text-sm font-medium mb-2">{habit.name}</div>
-
-              {/* 打卡记录 - 单个胶囊 */}
-              <div className="relative">
-                <div className="h-5 rounded-full overflow-hidden bg-gray-100 flex">
-                  {daysInMonth.map((day, index) => {
-                    const isCompleted = isHabitCompleted(habit.id, day)
-                    const isFirst = index === 0
-                    const isLast = index === daysInMonth.length - 1
-
-                    return (
-                      <div
-                        key={day.toString()}
-                        className={`h-full w-[3px] ${
-                          isCompleted ? habit.color : "bg-transparent"
-                        } ${isFirst ? "rounded-l-full" : ""} ${isLast ? "rounded-r-full" : ""}`}
-                        style={{
-                          // 确保所有日期平均分布在胶囊中
-                          width: `calc(100% / ${daysCount})`,
-                          minWidth: "2px",
-                        }}
-                      />
-                    )
-                  })}
-                </div>
+          <div key={habit.id} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {/* 习惯图标按钮 */}
+                <button
+                  onClick={() => recordHabit(habit.id)}
+                  className={`p-3 rounded-full ${habit.bgColor} hover:opacity-80 transition-opacity`}
+                >
+                  <div className={`text-${habit.color.split("-")[1]}-500`}>{habit.icon}</div>
+                </button>
+                {/* 习惯名称 */}
+                <span className="font-medium">{habit.name}</span>
               </div>
+              {/* 完成次数 */}
+              <div className="text-sm text-gray-500">x{habit.count}</div>
             </div>
 
-            {/* 完成次数 */}
-            <div className="text-sm text-gray-500 flex-shrink-0">x{habit.count}</div>
+            {/* 打卡记录 */}
+            <div className="flex gap-1">
+              <div className="flex rounded-full overflow-hidden bg-gray-100 w-full h-6">
+                {daysInMonth.map((day) => {
+                  const isCompleted = isHabitCompleted(habit.id, day)
+                  return (
+                    <div
+                      key={day.toString()}
+                      className={`h-full w-[3px] ${isCompleted ? habit.color : "bg-transparent"}`}
+                    />
+                  )
+                })}
+              </div>
+            </div>
           </div>
         ))}
       </div>
