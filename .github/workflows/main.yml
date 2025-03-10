@@ -34,55 +34,17 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Install coscmd
-        run: |
-          echo "开始安装 coscmd 和 tccli..."
-          pip install coscmd
-          pip install tccli
-          echo "coscmd 版本信息:"
-          coscmd -v
-          echo "安装完成"
-
-      - name: Configure coscmd
-        env:
-          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
-          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
-          BUCKET: ${{ secrets.TENCENT_BUCKET }}
-          REGION: ${{ secrets.TENCENT_REGION }}
-        run: |
-          echo "配置 coscmd..."
-          # 检查环境变量是否设置（不显示实际值）
-          if [ -z "$SECRET_ID" ]; then echo "错误: SECRET_ID 未设置"; exit 1; fi
-          if [ -z "$SECRET_KEY" ]; then echo "错误: SECRET_KEY 未设置"; exit 1; fi
-          if [ -z "$BUCKET" ]; then echo "错误: BUCKET 未设置"; exit 1; fi
-          if [ -z "$REGION" ]; then echo "错误: REGION 未设置"; exit 1; fi
-          
-          echo "环境变量已正确设置"
-          echo "配置 coscmd: coscmd config -a [SECRET_ID] -s [SECRET_KEY] -b $BUCKET -r $REGION"
-          coscmd config -a $SECRET_ID -s $SECRET_KEY -b $BUCKET -r $REGION
-          echo "配置完成"
-
-      - name: Test COS Access
-        run: |
-          echo "测试 COS 访问权限..."
-          echo "test content" > test_file.txt
-          coscmd upload test_file.txt test_file.txt || { echo "上传测试文件失败，可能是权限问题"; exit 1; }
-          coscmd list || { echo "列出存储桶内容失败，可能是权限问题"; exit 1; }
-          coscmd delete test_file.txt || { echo "删除测试文件失败，可能是权限问题"; exit 1; }
-          echo "COS 访问测试成功"
-
-      - name: Upload to COS
-        run: |
-          echo "开始上传文件到腾讯云COS..."
-          # 检查 out 目录是否存在
-          if [ ! -d "out" ]; then
-            echo "错误: out 目录不存在，构建可能失败"
-            exit 1
-          fi
-          
-          # 使用 -v 参数启用详细输出
-          coscmd upload -rfs --delete -v out/ / || { echo "上传失败"; exit 1; }
-          echo "上传完成"
+      # 使用腾讯云官方的GitHub Actions
+      - name: Deploy to Tencent COS
+        uses: TencentCloud/cos-action@v1
+        with:
+          secret_id: ${{ secrets.TENCENT_SECRET_ID }}
+          secret_key: ${{ secrets.TENCENT_SECRET_KEY }}
+          cos_bucket: ${{ secrets.TENCENT_BUCKET }}
+          cos_region: ${{ secrets.TENCENT_REGION }}
+          local_path: out
+          remote_path: /
+          clean: true
 
       - name: Output deployment URL
         run: |
