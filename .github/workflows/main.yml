@@ -1,9 +1,10 @@
-name: Deploy to COS
+name: Deploy to Tencent Cloud COS
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -15,15 +16,31 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
 
-      - name: Install COS CLI
-        run: npm install -g cos-cli
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
 
-      - name: Sync to COS
+      - name: Build
+        run: npm run build
         env:
-          SECRET_ID: ${{ secrets.SecretId }}
-          SECRET_KEY: ${{ secrets.SecretKey }}
-          BUCKET: ${{ secrets.Bucket }}
-          REGION: ${{ secrets.Region }}
-        run: coscmd upload -rfs --delete public/ /
+          NEXT_TELEMETRY_DISABLED: 1
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Install coscmd
+        run: pip install coscmd
+
+      - name: Configure coscmd
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+          BUCKET: ${{ secrets.TENCENT_BUCKET }}
+          REGION: ${{ secrets.TENCENT_REGION }}
+        run: |
+          coscmd config -a $SECRET_ID -s $SECRET_KEY -b $BUCKET -r $REGION
+
+      - name: Upload to COS
+        run: coscmd upload -rfs --delete out/ /
+        
+      - name: Output deployment URL
+        run: echo "Deployed to https://${{ secrets.TENCENT_BUCKET }}.cos.${{ secrets.TENCENT_REGION }}.myqcloud.com/index.html"
