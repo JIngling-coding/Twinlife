@@ -1,4 +1,4 @@
-name: Deploy to Tencent Cloud COS
+name: Deploy to Tencent Cloud Container Service
 
 on:
   push:
@@ -27,20 +27,35 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Install coscmd
-        run: pip install coscmd
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Configure coscmd
-        env:
-          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
-          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
-          BUCKET: ${{ secrets.TENCENT_BUCKET }}
-          REGION: ${{ secrets.TENCENT_REGION }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/twinlife:latest
+
+      - name: Install Tencent Cloud CLI
         run: |
-          coscmd config -a $SECRET_ID -s $SECRET_KEY -b $BUCKET -r $REGION
+          pip install tccli
+          tccli configure set secretId ${{ secrets.TENCENT_SECRET_ID }}
+          tccli configure set secretKey ${{ secrets.TENCENT_SECRET_KEY }}
+          tccli configure set region ${{ secrets.TENCENT_REGION }}
 
-      - name: Upload to COS
-        run: coscmd upload -rfs --delete out/ /
-        
-      - name: Output deployment URL
-        run: echo "Deployed to https://${{ secrets.TENCENT_BUCKET }}.cos.${{ secrets.TENCENT_REGION }}.myqcloud.com/index.html"
+      - name: Deploy to Tencent Cloud Container Service
+        run: |
+          tccli tke update-cluster-instances \
+            --ClusterId ${{ secrets.TENCENT_CLUSTER_ID }} \
+            --InstanceIds '["${{ secrets.TENCENT_INSTANCE_ID }}"]' \
+            --Force true
+          
+      - name: Output deployment info
+        run: echo "Deployed to Tencent Cloud Container Service"
