@@ -1,4 +1,4 @@
-name: Deploy to Tencent Cloud Container Service
+name: Deploy to Tencent Cloud COS
 
 on:
   push:
@@ -27,35 +27,25 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/twinlife:latest
-
-      - name: Install Tencent Cloud CLI
+      - name: Install coscmd
         run: |
+          pip install coscmd
           pip install tccli
-          tccli configure set secretId ${{ secrets.TENCENT_SECRET_ID }}
-          tccli configure set secretKey ${{ secrets.TENCENT_SECRET_KEY }}
-          tccli configure set region ${{ secrets.TENCENT_REGION }}
 
-      - name: Deploy to Tencent Cloud Container Service
+      - name: Configure coscmd
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+          BUCKET: ${{ secrets.TENCENT_BUCKET }}
+          REGION: ${{ secrets.TENCENT_REGION }}
         run: |
-          tccli tke update-cluster-instances \
-            --ClusterId ${{ secrets.TENCENT_CLUSTER_ID }} \
-            --InstanceIds '["${{ secrets.TENCENT_INSTANCE_ID }}"]' \
-            --Force true
-          
-      - name: Output deployment info
-        run: echo "Deployed to Tencent Cloud Container Service"
+          coscmd config -a $SECRET_ID -s $SECRET_KEY -b $BUCKET -r $REGION
+
+      - name: Upload to COS
+        run: |
+          echo "开始上传文件到腾讯云COS..."
+          coscmd upload -rfs --delete out/ /
+          echo "上传完成"
+
+      - name: Output deployment URL
+        run: echo "Deployed to https://${{ secrets.TENCENT_BUCKET }}.cos.${{ secrets.TENCENT_REGION }}.myqcloud.com/index.html"
